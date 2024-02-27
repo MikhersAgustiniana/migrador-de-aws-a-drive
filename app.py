@@ -30,7 +30,7 @@ def subir_archivo_local_a_drive(local_path, carpeta_drive_id):
     print(f'Subiendo: {key}')
     nuevo_id_carpeta = crear_carpeta(os.path.dirname(local_path), carpeta_drive_id)
     subir_archivo(f"backups/{local_path}", nuevo_id_carpeta)
-    os.remove(local_path)  # Borra el archivo de la carpeta local después de subirlo a Drive
+    os.remove(f"backups/{local_path}")  # Borra el archivo de la carpeta local después de subirlo a Drive
 
 # Código principal
 for obj in CONTENIDO_TOTAL_S3.get('Contents', []):
