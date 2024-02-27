@@ -1,7 +1,7 @@
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 
-directorio_credenciales = 'GoogleDrive/credentials_module.json'
+directorio_credenciales = 'credentials_module.json'
 
 # INICIAR SESION
 def login():
