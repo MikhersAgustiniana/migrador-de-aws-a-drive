@@ -28,7 +28,7 @@ def descargar_archivo(bucket_name, key):
 
 def subir_archivo_local_a_drive(local_path, carpeta_drive_id):
     print(f'Subiendo: {key}')
-    nuevo_id_carpeta = crear_carpeta(os.path.dirname(local_path.split("backups/")[0]), carpeta_drive_id)
+    nuevo_id_carpeta = crear_carpeta(os.path.dirname(local_path.split("backups/")[1].split("/clarity_")[0]), carpeta_drive_id)
     subir_archivo(local_path, nuevo_id_carpeta)
     os.remove(local_path)  # Borra el archivo de la carpeta local después de subirlo a Drive
 
