@@ -21,15 +21,15 @@ def descargar_archivo(bucket_name, key):
     try:
         # Eliminar cualquier identificador adicional al final del nombre del archivo
         CLIENTE_S3.download_file(bucket_name, Key=key, Filename=f"backups/{key}")
-        return f"backups/{key}"
+        return key
     except FileNotFoundError as e:
         print(f'ERROR: No se pudo encontrar el archivo en S3: {e}')
         return None
 
 def subir_archivo_local_a_drive(local_path, carpeta_drive_id):
     print(f'Subiendo: {key}')
-    nuevo_id_carpeta = crear_carpeta(os.path.dirname(local_path.split("backups/")[1].split("/clarity_")[0]), carpeta_drive_id)
-    subir_archivo(local_path, nuevo_id_carpeta)
+    nuevo_id_carpeta = crear_carpeta(os.path.dirname(local_path), carpeta_drive_id)
+    subir_archivo(f"backups/{local_path}", nuevo_id_carpeta)
     os.remove(local_path)  # Borra el archivo de la carpeta local después de subirlo a Drive
 
 # Código principal
