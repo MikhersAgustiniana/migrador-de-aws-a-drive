@@ -19,7 +19,8 @@ clarity_buho_backups.json
 # credenciales de DRIVE
 client_secrets.json
 credentials_module.json
-
+client_secrets_backups.json
+credentials_module_backups.json
 
 
 # Distribution / packaging

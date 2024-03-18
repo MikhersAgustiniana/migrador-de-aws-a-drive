@@ -1,6 +1,8 @@
 import os
+import time
+import random
 import dotenv
-
+from pydrive2.files import ApiRequestError
 
 from GoogleDrive.GoogleDrive import subir_archivo, crear_carpeta
 from AWS.descargador_de_aws import CLIENTE_S3
@@ -27,13 +29,35 @@ def descargar_archivo(bucket_name, key):
         return None
 
 def subir_archivo_local_a_drive(local_path, carpeta_drive_id):
-    print(f'Subiendo: {key}')
+    print(f'Subiendo: {local_path}')
     nuevo_id_carpeta = crear_carpeta(os.path.dirname(local_path), carpeta_drive_id)
-    subir_archivo(f"backups/{local_path}", nuevo_id_carpeta)
-    os.remove(f"backups/{local_path}")  # Borra el archivo de la carpeta local después de subirlo a Drive
+    try:
+        subir_archivo(f"backups/{local_path}", nuevo_id_carpeta)
+        os.remove(f"backups/{local_path}")  # Borra el archivo de la carpeta local después de subirlo a Drive
+    except ApiRequestError as e:
+        if 'userRateLimitExceeded' in str(e):
+            # Si se supera el límite de velocidad de solicitud del usuario, aplicamos la estrategia de retirada exponencial
+            n = 0
+            while True:
+                wait_time = min(((2 ** n) + random.randint(0, 1000)), 64000) / 1000  # Tiempo de espera en segundos
+                print(f'Error 403: Límite de velocidad de solicitud del usuario excedido. Esperando {wait_time} segundos antes de volver a intentar...')
+                time.sleep(wait_time)
+                n += 1
+                try:
+                    subir_archivo(f"backups/{local_path}", nuevo_id_carpeta)
+                    os.remove(f"backups/{local_path}")
+                    break  # Si la subida tiene éxito, salimos del bucle
+                except ApiRequestError as e:
+                    if 'userRateLimitExceeded' not in str(e):
+                        print(f'Error desconocido al subir el archivo: {e}')
+                        break  # Si se produce un error diferente, salimos del bucle
 
-# Código principal
+### Código principal
 for obj in CONTENIDO_TOTAL_S3.get('Contents', []):
     key = obj['Key'].rstrip('/')
     archivo_local = descargar_archivo(bucket_name, key)
     subir_archivo_local_a_drive(archivo_local, carpeta_drive_id)
+
+### PARA PRUEBAS DE DRIVE SUBIR CUALQUIER COSA
+# prueba = 'python-prueba.py'
+# subir_archivo(f"backups/{prueba}", carpeta_drive_id)
